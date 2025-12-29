@@ -1,0 +1,50 @@
+from requests import Session, Response, RequestException, adapters
+from typing import Any
+from urllib3.util.retry import Retry
+# import urllib3
+
+# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+class APIClient:
+    def __init__(self, base_url: str, token: str, timeout: float = 10.0, retries: int = 2, backoff: float = 0.3, verify: bool = False):
+        self.verify = verify
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+        self.session = Session()
+        self.session.headers.update({
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/json",
+        })
+
+        retry = Retry(total=retries, backoff_factor=backoff, status_forcelist=[429,500,502,503,504], allowed_methods=frozenset(["GET","POST"]))
+        adapter = adapters.HTTPAdapter(max_retries=retry)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
+
+    def _url(self, path: str) -> str:
+        return f"{self.base_url}/{path.lstrip('/')}"
+
+    def request(self, method: str, path: str, **kwargs) -> Response:
+        kwargs.setdefault("timeout", self.timeout)
+        kwargs.setdefault("verify", self.verify)
+        try:
+            resp = self.session.request(method, self._url(path), **kwargs)
+            resp.raise_for_status()
+            return resp
+        except RequestException as exc:
+            # Optionally log or wrap exception
+            raise
+
+    def get(self, path: str, params: dict | None = None, **kwargs) -> Response:
+        return self.request("GET", path, params=params, **kwargs)
+
+    def post(self, path: str, json: Any | None = None, data: Any | None = None, **kwargs) -> Response:
+        return self.request("POST", path, json=json, data=data, **kwargs)
+
+    def close(self) -> None:
+        self.session.close()
+
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
