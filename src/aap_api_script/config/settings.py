@@ -11,5 +11,3 @@ if not API_TOKEN:
     raise RuntimeError("AAP_API_TOKEN is not set")
 if not API_BASE_URL:
     raise RuntimeError("AAP_API_BASE_URL is not set")
-
-API_BASE_URL = API_BASE_URL.rstrip("/")
