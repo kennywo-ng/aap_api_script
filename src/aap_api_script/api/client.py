@@ -1,9 +1,9 @@
 from requests import Session, Response, RequestException, adapters
-from typing import Any
+from typing import Any, Iterator
 from urllib3.util.retry import Retry
-# import urllib3
+import urllib3
 
-# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class APIClient:
     def __init__(self, base_url: str, token: str, timeout: float = 10.0, retries: int = 2, backoff: float = 0.3, verify: bool = False):
@@ -29,17 +29,47 @@ class APIClient:
         kwargs.setdefault("verify", self.verify)
         try:
             resp = self.session.request(method, self._url(path), **kwargs)
-            resp.raise_for_status()
+            # resp.raise_for_status() # Commented out as each request will cover its own error handling
             return resp
         except RequestException as exc:
             # Optionally log or wrap exception
             raise
 
+    def get_pagination(self,
+                path: str,
+                params: dict | None = None,
+                page_param: str = "page",
+                results_key: str = "results") -> Iterator[dict]:
+        params = dict(params or {})
+        page = 1
+        while True:
+            params[page_param] = page
+            resp = self.get(path, params=params)
+            payload = resp.json()
+
+            if payload.get("detail") == "Invalid page.":
+                break
+
+            items = payload.get(results_key)
+            if not items:
+                break
+
+            resp.raise_for_status()
+
+            yield from items
+            page += 1
+
     def get(self, path: str, params: dict | None = None, **kwargs) -> Response:
-        return self.request("GET", path, params=params, **kwargs)
+        try:
+            return self.request("GET", path, params=params, **kwargs)
+        except RequestException as e:
+            print("Error occured:", e)
 
     def post(self, path: str, json: Any | None = None, data: Any | None = None, **kwargs) -> Response:
-        return self.request("POST", path, json=json, data=data, **kwargs)
+        try:    
+            return self.request("POST", path, json=json, data=data, **kwargs)
+        except RequestException as e:
+            print("Error occured:", e)
 
     def close(self) -> None:
         self.session.close()
