@@ -46,14 +46,13 @@ class APIClient:
             params[page_param] = page
             resp = self.get(path, params=params)
             payload = resp.json()
-
-            if payload.get("detail") == "Invalid page.":
-                break
-
             items = payload.get(results_key)
+
+            if resp.status_code >= 400:
+                break
             if not items:
                 break
-
+            
             resp.raise_for_status()
 
             yield from items
