@@ -5,7 +5,7 @@ from config.settings import (
     API_TIMEOUT,
 )
 
-def get_int(base_url: str, token: str, timeout: float) -> dict:
+def get_inv(base_url: str, token: str, timeout: float) -> dict:
     with APIClient(base_url=base_url, token=token, timeout=timeout) as c:
         inventory = list(c.get_pagination(f"/inventories/"))
     return inventory
@@ -28,7 +28,7 @@ def match_host_to_inv(host_name: list, inventory_list: list) -> dict:
 
 def get_host_w_inventory(base_url: str, token: str, timeout: float) -> dict:
     inventory_host = get_host(base_url, token, timeout)
-    inventory = get_int(base_url, token, timeout)
+    inventory = get_inv(base_url, token, timeout)
     host_with_inv = match_host_to_inv(inventory_host, inventory)
     return host_with_inv
 
