@@ -1,4 +1,4 @@
-from api import get_host_w_inventory, get_inv
+from api import get_host_w_inventory, get_inv, post_bulk_imp
 from config.settings import (
     API_BASE_URL,
     API_TOKEN,
@@ -41,7 +41,7 @@ def main():
     1. Print inventory hosts with inventory names
     2. Compare hosts from excel with inventory hosts
     3. Bulk import hosts to inventory
-    4
+    4. 
     """)
 
     choice = input("Enter your choice: ")
@@ -61,14 +61,52 @@ def main():
             print(f"Host: {item['host_name']:<30} Inventory: {item['inventory_name']}")
 
     elif choice == "3":
-        exc_bulk_host = excel_parse_hostname('excels/host_bulk_import.xlsx')
-        for item in exc_bulk_host:
-            print(item['Hostname'])
+        excel_bulk_host = excel_parse_hostname('excels/host_bulk_import.xlsx')
         aap_inv = get_inv(API_BASE_URL, API_TOKEN, API_TIMEOUT)
 
+        print("Which inventory to add hosts to?")
+        print(f"{'ID':<5}{'Inventory Name'}")
         for item in aap_inv:
-            print(item['name'])
+            print(f"{item['id']:<5}{item['name']}")
 
+        inv_id = input("\nEnter Inventory ID: ")
+
+        try:
+            inv_id = int(inv_id)
+        except ValueError:
+            raise ValueError("Input must be integer.")
+
+        for item in aap_inv:
+            if item['id'] == int(inv_id):
+                print("\nWould you like to add the following hosts to: " + item['name'])
+                break
+        else:
+            print("Inventory ID not found. Operation cancelled")
+            SystemExit(0)
+
+        for host in excel_bulk_host:
+            print(f"- {host['Hostname']}")
+
+        confirm = input("\nConfirm? (y/n): ")
+        if confirm.lower() == 'y':
+            import_bulk = post_bulk_imp(API_BASE_URL, API_TOKEN, API_TIMEOUT, inv_id, excel_bulk_host)
+            if import_bulk.status_code >= 200 and import_bulk.status_code < 300:
+                print("Status code: " + str(import_bulk.status_code))
+            else:
+                print(f"Failed to import hosts. {import_bulk.json()['__all__']}")
+        elif confirm.lower() == 'n':
+            print("Operation cancelled.")
+            SystemExit(0)
+        else:
+            print("Invalid input. Operation cancelled.")
+            SystemExit(0)
+
+    elif choice == "4":
+        print("TBC")
+
+    else:
+        print("Invalid choice.")
+        main()
 
 if __name__ == "__main__":
     main()

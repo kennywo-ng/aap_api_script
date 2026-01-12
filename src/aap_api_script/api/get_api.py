@@ -1,9 +1,4 @@
 from .client import APIClient
-from config.settings import (
-    API_BASE_URL,
-    API_TOKEN,
-    API_TIMEOUT,
-)
 
 def get_inv(base_url: str, token: str, timeout: float) -> dict:
     with APIClient(base_url=base_url, token=token, timeout=timeout) as c:
@@ -31,8 +26,3 @@ def get_host_w_inventory(base_url: str, token: str, timeout: float) -> dict:
     inventory = get_inv(base_url, token, timeout)
     host_with_inv = match_host_to_inv(inventory_host, inventory)
     return host_with_inv
-
-if __name__ == "__main__":
-    host_w_inv = get_host_w_inventory(API_BASE_URL, API_TOKEN, API_TIMEOUT)
-    for item in host_w_inv:
-            print(f"Host: {item['host_name']:<30} Inventory: {item['inventory_name']}")
