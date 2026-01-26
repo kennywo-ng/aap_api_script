@@ -1,13 +1,11 @@
 from .client import APIClient
 
-def get_inv(base_url: str, token: str, timeout: float) -> dict:
-    with APIClient(base_url=base_url, token=token, timeout=timeout) as c:
-        inventory = list(c.get_pagination(f"/inventories/"))
+def get_inv(client) -> dict:
+    inventory = list(client.get_pagination(f"/inventories/"))
     return inventory
 
-def get_host(base_url: str, token: str, timeout: float) -> dict:
-    with APIClient(base_url=base_url, token=token, timeout=timeout) as c:
-        hosts = list(c.get_pagination(f"/hosts/"))
+def get_host(client) -> dict:
+    hosts = list(client.get_pagination(f"/hosts/"))
     return hosts
 
 def match_host_to_inv(host_name: list, inventory_list: list) -> dict:
@@ -21,8 +19,8 @@ def match_host_to_inv(host_name: list, inventory_list: list) -> dict:
         })
     return results
 
-def get_host_w_inventory(base_url: str, token: str, timeout: float) -> dict:
-    inventory_host = get_host(base_url, token, timeout)
-    inventory = get_inv(base_url, token, timeout)
+def get_host_w_inventory(client) -> dict:
+    inventory_host = get_host(client)
+    inventory = get_inv(client)
     host_with_inv = match_host_to_inv(inventory_host, inventory)
     return host_with_inv

@@ -7,28 +7,16 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-class APIClient:
-    def __init__(self, base_url: str, token: str | None = None, username: str | None = None, password: str | None = None,
-                timeout: float = 10.0, retries: int = 2, backoff: float = 0.3, verify: bool = False):
+class APIClient_tmp:
+    def __init__(self, base_url: str, username: str, psw: str, timeout: float = 10.0, retries: int = 2, backoff: float = 0.3, verify: bool = False):
         self.verify = verify
         self.base_url = base_url
         self.timeout = timeout
         self.session = Session()
+        self.session.auth = HTTPBasicAuth(username,psw)
         self.session.headers.update({
             "Accept": "application/json",
         })
-
-        if username and password:
-            self.session.auth = HTTPBasicAuth(username, password)
-
-        elif token:
-            # Use Bearer Token
-            self.session.headers.update({
-                "Authorization": f"Bearer {token}",
-            })
-
-        else:
-            raise ValueError("Either (username, password) or token must be provided")
 
         retry = Retry(total=retries, backoff_factor=backoff, status_forcelist=[429,500,502,503,504], allowed_methods=frozenset(["GET","POST"]))
         adapter = adapters.HTTPAdapter(max_retries=retry)
@@ -65,16 +53,8 @@ class APIClient:
         except RequestException as e:
             print("Error occured:", e)
 
-    def post(self, path: str, json: Any | None = None, data: Any | None = None, **kwargs) -> Response:
-        try:    
-            return self.session.post(self._url(path), json=json, data=data, verify=self.verify, **kwargs)
-        except RequestException as e:
-            print("Error occured:", e)
-
-    def close(self) -> None:
-        self.session.close()
-
     def __enter__(self):
         return self
+
     def __exit__(self, exc_type, exc, tb):
-        self.close()
+        self.session.close()
