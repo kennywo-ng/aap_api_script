@@ -1,3 +1,9 @@
 requests
 python-dotenv
 pandas
+json
+sys
+urllib3
+getpass
+os
+requests
