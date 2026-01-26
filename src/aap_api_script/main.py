@@ -69,7 +69,7 @@ def main():
     if choice == "1":
         host_w_inv = get_host_w_inventory(client)
         for item in host_w_inv:
-            print(f"Host: {item['host_name']:<30} Inventory: {item['inventory_name']}")
+            print(f"Host: {item['host_name']:<40} Inventory: {item['inventory_name']}")
         
     elif choice == "2":
         exc_host = excel_parse_hostname('excels/host_check.xlsx')
@@ -77,7 +77,7 @@ def main():
         matches = match_hosts(exc_host, host_w_inv)
 
         for item in sorted(matches, key=lambda x: x['inventory_name']):
-            print(f"Host: {item['host_name']:<30} Inventory: {item['inventory_name']}")
+            print(f"Host: {item['host_name']:<40} Inventory: {item['inventory_name']}")
 
     elif choice == "3":
         excel_bulk_host = excel_parse_hostname('excels/host_bulk_import.xlsx')

@@ -57,6 +57,7 @@ class APIClient:
             resp.raise_for_status()
 
             yield from payload
+            print("Fetched api:", path, "page:", page)
             page += 1
 
     def get(self, path: str, params: dict | None = None, **kwargs) -> Response:
