@@ -1,4 +1,5 @@
 from requests import Session, Response, RequestException, adapters
+from requests.auth import HTTPBasicAuth
 from typing import Any, Iterator
 from urllib3.util.retry import Retry
 
@@ -7,15 +8,27 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class APIClient:
-    def __init__(self, base_url: str, token: None, timeout: float = 10.0, retries: int = 2, backoff: float = 0.3, verify: bool = False):
+    def __init__(self, base_url: str, token: str | None = None, username: str | None = None, password: str | None = None,
+                timeout: float = 10.0, retries: int = 2, backoff: float = 0.3, verify: bool = False):
         self.verify = verify
         self.base_url = base_url
         self.timeout = timeout
         self.session = Session()
         self.session.headers.update({
-            "Authorization": f"Bearer {token}",
             "Accept": "application/json",
         })
+
+        if username and password:
+            self.session.auth = HTTPBasicAuth(username, password)
+
+        elif token:
+            # Use Bearer Token
+            self.session.headers.update({
+                "Authorization": f"Bearer {token}",
+            })
+
+        else:
+            raise ValueError("Either (username, password) or token must be provided")
 
         retry = Retry(total=retries, backoff_factor=backoff, status_forcelist=[429,500,502,503,504], allowed_methods=frozenset(["GET","POST"]))
         adapter = adapters.HTTPAdapter(max_retries=retry)
