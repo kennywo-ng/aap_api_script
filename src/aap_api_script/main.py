@@ -95,13 +95,13 @@ def main():
         except ValueError:
             raise ValueError("Input must be integer.")
 
-        if int(inv_id) not in [item['id'] for item in aap_inv]:
-            sys.exit("Inventory ID not found. Operation cancelled")
-
         for item in aap_inv:
             if item['id'] == int(inv_id):
                 print("\nWould you like to add the following hosts to: " + item['name'])
                 break
+            
+        else:
+            sys.exit("Inventory ID not found. Operation cancelled")
 
         for host in excel_bulk_host:
             print(f"- {host['Hostname']}")
