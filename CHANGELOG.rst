@@ -14,3 +14,8 @@ Version 0.4.1
 - Added support for basic auth
 - Simplified get/post api functions
 - Updated output formatting for better readability
+
+Version 0.4.2
+- Simplify codes to make it easier to read and maintain
+- Added function 4 to create group in inventory (still work in progress)
+- Added jenkinsfile for testing CI/CD pipeline

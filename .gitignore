@@ -1,5 +1,4 @@
 __pycache__/
 .env.*
 !.env.example
-src/aap_api_script/excels/host_bulk_import.xlsx
-src/aap_api_script/excels/host_check.xlsx
+src/aap_api_script/excels/*
