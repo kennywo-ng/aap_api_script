@@ -2,7 +2,7 @@ import os
 import getpass
 from dotenv import load_dotenv
 
-load_dotenv('../../.env.stage')
+load_dotenv('../../.env.prod')
 
 API_BASE_URL = os.getenv("AAP_API_BASE_URL")
 API_TIMEOUT = int(os.getenv("AAP_API_TIMEOUT", "5"))

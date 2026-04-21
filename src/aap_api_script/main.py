@@ -90,7 +90,7 @@ def main():
         host_w_inv = get_host_w_inventory(client)
         for item in host_w_inv:
             print(f"Host: {item['host_name']:<40} Inventory: {item['inventory_name']}")
-        
+
     elif choice == "2":
         exc_host = excel_parse_hostname('excels/host_check.xlsx')
         host_w_inv = get_host_w_inventory(client)
@@ -107,10 +107,10 @@ def main():
         while selected_inv is None:
             selected_inv = sel_id(aap_inv, "inventory")
 
-            if selected_inv:
-                print("\nWould you like to add the following hosts to: " + selected_inv['name'])
-            else:
+            if not selected_inv:
                 print("\nInventory ID not found. Please try again.")
+            
+            print("\nWould you like to add the following hosts to: " + selected_inv['name'])
 
         for host in excel_bulk_host:
             print(f"- {host['Hostname']}")
@@ -146,7 +146,7 @@ def main():
                 print("\nInventory ID not found. Please try again.")
 
         aap_inv_groups = get_inv_group(client, selected_inv['id'])
-        host_w_inv = get_host_w_inventory(client)
+        # host_w_inv = get_host_w_inventory(client)
 
         while selected_grp is None:
             selected_grp = sel_id(aap_inv_groups, "group")
