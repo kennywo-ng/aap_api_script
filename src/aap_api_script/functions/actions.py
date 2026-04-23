@@ -9,12 +9,12 @@ from config.settings import (
 )
 
 from .helpers import (
-    get_host_w_inventory,
     excel_parse_hostname,
     match_hosts,
     sel_id
 )
 from api import (
+    get_host_w_inventory,
     get_inv,
     get_inv_group,
     post_bulk_imp,
