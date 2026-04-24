@@ -11,7 +11,8 @@ from config.settings import (
 from .helpers import (
     excel_parse_hostname,
     match_hosts,
-    sel_id
+    sel_id,
+    prompt_till_valid
 )
 from api import (
     get_host_w_inventory,
@@ -53,15 +54,9 @@ def func_2():
 def func_3():
     excel_bulk_host = excel_parse_hostname('excels/host_bulk_import.xlsx')
     aap_inv = get_inv(client)
-    selected_inv = None
-
-    while selected_inv is None:
-        selected_inv = sel_id(aap_inv, "inventory")
-
-        if not selected_inv:
-            print("\nInventory ID not found. Please try again.")
-        
-        print("\nWould you like to add the following hosts to: " + selected_inv['name'])
+    selected_inv = prompt_till_valid(aap_inv, "Inventory")
+    
+    print("\nWould you like to add the following hosts to: " + selected_inv['name'])
 
     for host in excel_bulk_host:
         print(f"- {host['Hostname']}")
@@ -86,24 +81,12 @@ def func_3():
 def func_4():
     exc_group_host = excel_parse_hostname('excels/host_grouping.xlsx')
     aap_inv = get_inv(client)
-    selected_inv = None
-    selected_grp = None
 
-    while selected_inv is None:
-        selected_inv = sel_id(aap_inv, "inventory")
-        if selected_inv:
-            break
-        else:
-            print("\nInventory ID not found. Please try again.")
+    selected_inv = prompt_till_valid(aap_inv, "Inventory")
 
     aap_inv_groups = get_inv_group(client, selected_inv['id'])
 
-    while selected_grp is None:
-        selected_grp = sel_id(aap_inv_groups, "group")
-        if selected_grp:
-            break
-        else:
-            print("\nGroup ID not found. Please try again.")
+    selected_grp = prompt_till_valid(aap_inv_groups, "Group")
 
     print(f"\nInventory: {selected_inv['name']} \nGroup: {selected_grp['name']} ")
     print("Hosts to be added to group:")

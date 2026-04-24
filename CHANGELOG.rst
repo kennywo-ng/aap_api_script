@@ -19,3 +19,7 @@ Version 0.4.2
 - Simplify codes to make it easier to read and maintain
 - Added function 4 to create group in inventory (still work in progress)
 - Added jenkinsfile for testing CI/CD pipeline
+
+Version 0.4.3
+- Revamped some codebase for better readability and maintainability
+- Function 4 to create group in inventory (still work in progress)

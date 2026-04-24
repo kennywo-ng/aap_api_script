@@ -40,13 +40,21 @@ def sel_id(inv: list, type: str) -> list | None:
     for item in inv:
         print(f"{item['id']:<5}{item['name']}")
 
-    inv_id = None
-    while inv_id is None:
+    id_num = None
+    while id_num is None:
         try:
-            inv_id = int(input(f"\nEnter {type} ID: "))
+            id_num = int(input(f"\nEnter {type} ID: "))
         except ValueError:
             print("Invalid input. Please enter a valid ID.")
 
-    inv_id_match = next((i for i in inv if i['id'] == inv_id), None)
+    id_match = next((i for i in inv if i['id'] == id_num), None)
 
-    return inv_id_match
+    return id_match
+
+def prompt_till_valid(list: list, label: str) -> list:
+    selected = None
+    while selected is None:
+        selected = sel_id(list, label)
+        if selected is None:
+            print(f"\n{label} ID not found. Please try again.")
+    return selected
